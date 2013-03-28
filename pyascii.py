@@ -3,34 +3,21 @@ import optparse
 import time;
 from PIL import Image
 
-def convert_to_ascii(image, ascii_map=['.', '*', '#']):
-    ascii_output = ''
-    for y in range(0,image.size[1]):
-        for x in range(0,image.size[0]):
-            pixel = image.getpixel((x,y))
-            level = int((pixel[0] + pixel[1] + pixel[2])/3)
-            value = ((float(level)/255)*len(ascii_map)+.5)-1
-            ascii_output += ascii_map[int(value)]
-            # print pixel, level, value
-        ascii_output += "\n";
-    print ascii_output,
-
 # TODO ther is a bug where if you put in an odd offset it will crash or 
 # produce messed up results
-def convert_to_ascii_2(image, ascii_map=['.', '*', '#']):
+def convert_to_ascii(image, ascii_map=['.', '*', '#']):
     ascii_output = ''
     pixels = image.tostring()
     print image.size
     for y in range(0,image.size[1]):
         for x in range(0,image.size[0]):
-            offset = (x+y*image.size[1])*3
+            offset = (x+y*image.size[0])*3
             pixel = pixels[offset:offset+3]
             level = (ord(pixel[0]) + ord(pixel[1]) + ord(pixel[2]))/3
             value = ((float(level)/255)*len(ascii_map)+.5)-1
             ascii_output += ascii_map[int(value)]
-            # print pixel, level, value
         ascii_output += "\n";
-    print ascii_output,
+    return ascii_output
 
 
 if __name__ == '__main__':
@@ -73,11 +60,6 @@ if __name__ == '__main__':
         if options.ascii_map:
             ascii_map = options.ascii_map[:]
 
-        print width, height
         image = image.resize((int(width), int(height)))
 
-        start = time.time()
-        convert_to_ascii_2(image, ascii_map)
-        print time.time() - start
-
-   
+        print convert_to_ascii(image, ascii_map),
