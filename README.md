@@ -6,6 +6,7 @@ WEB
   http://jluedke.com/pyascii
 
 ABOUT
+
   pyascii is a utility that converts an image into ascii art.
 
 INSTALLATION
