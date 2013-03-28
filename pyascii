@@ -1,26 +1,47 @@
 #!/usr/bin/env python
+''' 
+Desc: This utility is used to convert an image into ascii art.
+Author: James M. Luedke <contact@jluedke.com>
+
+This utility is uncopyrighted. Its authors have released all claims on 
+copyright and has put all the content of this website into the public domain. 
+
+No permission is needed to copy, distribute, or modify the content of this 
+site. Credit is appreciated but not required.
+
+"Be excellent to each other..."
+
+'''
 import optparse
-import time;
 from PIL import Image
 
-# TODO ther is a bug where if you put in an odd offset it will crash or 
-# produce messed up results
-def convert_to_ascii(image, ascii_map=['.', '*', '#']):
+G_ASCII_MAP = [
+    '.', ',', ';', '!', '|',
+    '\'', ' ', '^', '~', '*',
+    'a', 'O', '0', '%', '#']
+
+
+def convert_to_ascii(image, ascii_map=None):
+    '''given a PIL image it will convert the image to ascii art'''
+    if not ascii_map:
+        ascii_map = G_ASCII_MAP
+
     ascii_output = ''
     pixels = image.tostring()
     print image.size
-    for y in range(0,image.size[1]):
-        for x in range(0,image.size[0]):
-            offset = (x+y*image.size[0])*3
-            pixel = pixels[offset:offset+3]
-            level = (ord(pixel[0]) + ord(pixel[1]) + ord(pixel[2]))/3
-            value = ((float(level)/255)*len(ascii_map)+.5)-1
+    for ypix in range(0, image.size[1]):
+        for xpix in range(0, image.size[0]):
+            offset = (xpix + ypix * image.size[0]) * 3
+            pixel = pixels[offset:offset + 3]
+            level = (ord(pixel[0]) + ord(pixel[1]) + ord(pixel[2])) / 3
+            value = ((float(level) / 255) * len(ascii_map) + .5) - 1
             ascii_output += ascii_map[int(value)]
-        ascii_output += "\n";
+        ascii_output += "\n"
     return ascii_output
 
 
-if __name__ == '__main__':
+def main():
+    ''' parse args and calls convert_to_ascii '''
     usage = "usage: %prog [options] <image>"
     parser = optparse.OptionParser(usage=usage, add_help_option=False)
 
@@ -33,38 +54,40 @@ if __name__ == '__main__':
     parser.add_option('-m', '--ascii_map', metavar='STRING', type='string',
         help='character map used to map colors to')
 
-    parser.add_option('-?', '--help', help='show this help message', action="store_true", dest="help")
+    parser.add_option('-?', '--help', action="store_true", dest="help",
+        help='show this help message')
 
     (options, args) = parser.parse_args()
     if options.help:
         parser.print_help()
+        exit(0)
 
+    ascii_map = G_ASCII_MAP
 
     for image_name in args:
         image = Image.open(image_name)
-
-        width = None
         height = None
 
         if options.width:
             width = options.width
         elif not options.width and options.height:
-            width = int(float(options.height)/image.size[1]*image.size[0]*2)
+            width = int(float(options.height) /
+                image.size[1] * image.size[0] * 2)
         else:
             width = 72
-            
+
         if options.height:
             height = options.height
         else:
             # scale based on image width
-            height = int(image.size[1]*((float(width)/image.size[0])/2))
-        ascii_map = [
-            '.', ',', ';', '!', '|',
-            '\'', ' ', '^', '~', '*', 
-            'a', 'O', '0', '%', '#']
+            height = int(image.size[1] * ((float(width) / image.size[0]) / 2))
         if options.ascii_map:
             ascii_map = options.ascii_map[:]
 
         image = image.resize((int(width), int(height)))
 
         print convert_to_ascii(image, ascii_map),
+
+if __name__ == '__main__':
+    main()
+
