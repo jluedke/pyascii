@@ -22,18 +22,23 @@ def convert_to_ascii(image, ascii_map=['.', '*', '#']):
 
 if __name__ == '__main__':
     usage = "usage: %prog [options] <image>"
-    parser = optparse.OptionParser(usage=usage)
+    parser = optparse.OptionParser(usage=usage, add_help_option=False)
 
     parser.add_option('-w', '--width', metavar='STRING', type='int',
         help='specify the output width to use')
 
-    parser.add_option('-H', '--height', metavar='STRING', type='int',
+    parser.add_option('-h', '--height', metavar='STRING', type='int',
         help='specify the output height to use')
 
     parser.add_option('-m', '--ascii_map', metavar='STRING', type='string',
         help='character map used to map colors to')
 
+    parser.add_option('-?', '--help', help='show this help message', action="store_true", dest="help")
+
     (options, args) = parser.parse_args()
+    if options.help:
+        parser.print_help()
+
 
     for image_name in args:
         image = Image.open(image_name)
